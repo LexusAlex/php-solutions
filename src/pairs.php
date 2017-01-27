@@ -1,6 +1,6 @@
 <?php
 
-namespace phpSolutions\pairs;
+namespace pairs;
 
 /**
  * @param $x mixed first value
@@ -36,4 +36,35 @@ function cdr(callable $pair)
     return $pair(function () {
         return func_get_arg(1);
     });
+}
+
+/**
+ * pairs to string
+ * @param $list
+ * @return string
+ */
+function toString($list)
+{
+    if (!is_callable($list)) {
+        return $list;
+    }
+
+    $iter = function ($items, array $acc = []) use (&$iter) {
+        if (is_null($items)) {
+            return $acc;
+        }
+
+        if (is_scalar($items)) {
+            $acc[] = $items;
+            return $acc;
+        }
+        $first = car($items);
+        $last = cdr($items);
+
+        return $iter($last, array_merge($acc, [toString($first)]));
+    };
+
+    $arr = $iter($list);
+
+    return "(" . implode(", ", $arr) . ")";
 }

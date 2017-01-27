@@ -1,5 +1,5 @@
 {
-    "name": "alex/php-solutions",
+    "name": "LexusAlex/php-solutions",
     "authors": [
         {
             "name": "Alexsey",
@@ -10,9 +10,10 @@
       "php": ">=5.5.0"
     },
     "require-dev": {},
-    "autoload": {
-      "files": [
-        "src/pairs.php"
-      ]
-    }
+  "autoload": {
+    "files": [
+      "src/pairs.php",
+      "src/lists.php"
+    ]
+  }
 }
