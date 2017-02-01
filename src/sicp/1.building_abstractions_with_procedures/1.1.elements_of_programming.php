@@ -1,6 +1,7 @@
 <?php
 // Building abstractions with procedures
 // Построение абстракций с помощью процедур
+// Элементы программирования
 
 /*
  prefix (+ 1 1 )
@@ -73,11 +74,12 @@ function module($x)
 {
     if ($x < 0) { // предикат
         return -$x; // ветка
-    }else{
+    } else {
         return $x;
     }
 
 }
+
 // можно так что аналогично
 $x = 19;
 ($x < 0) ? $x = -$x : $x;
@@ -111,22 +113,22 @@ $result = ($x > $y || $x == $y); // одно число больше либо р
 
 // Упражнения
 // 1
-$r = ( 5 + 3 + 4); // 12
-$r = ( 9 - 1); // 8
-$r = ( 6 / 2); // 3
-$r = (( 2 * 4) + (4 - 6)); // 8 + (-2) = 6
+$r = (5 + 3 + 4); // 12
+$r = (9 - 1); // 8
+$r = (6 / 2); // 3
+$r = ((2 * 4) + (4 - 6)); // 8 + (-2) = 6
 $a = 3;
 $b = $a + 1; //4
 $r = ($a + $b + ($a * $b)); // 3 + 4 + 12 = 19
 $r = ($a == $b); //false
 
-if(($b > $a) && ($b < ($a * $b))){ // (true) && (4 < 12) = true && true = true = 4
+if (($b > $a) && ($b < ($a * $b))) { // (true) && (4 < 12) = true && true = true = 4
     $r = $b;
 }
 
-if(($a == 4)){
+if (($a == 4)) {
     $r = 6;
-} elseif ($b == 4){
+} elseif ($b == 4) {
     $r = $a + 6 + 7; // 3 + 6 + 7 = 16
 } else {
     $r = 25;
@@ -134,9 +136,9 @@ if(($a == 4)){
 
 $r = (2 + (($b > $a) ? $b : $a)); // (2 + (true) ? 4 : 3) = (2 + 4) = 6
 
-if($a > $b){
+if ($a > $b) {
     $r = $a;
-}elseif ($a < $b){
+} elseif ($a < $b) {
     $r = $b;
 } else {
     $r = -1;
@@ -147,7 +149,7 @@ $r = ($r * ($a + 1)); //16
 //Определите процедуру, которая принимает в качестве аргументов три числа и возвращает сумму квадратов двух больших из них.
 $sumOfSquaresOfTopTwo = function ($a, $b, $c) use ($sumOfSquares) {
 
-    if($a == max([$a, $b])){ // 4, 2, 3   4 == max (4, 2)
+    if ($a == max([$a, $b])) { // 4, 2, 3   4 == max (4, 2)
         return $sumOfSquares($a, max([$b, $c])); // 4 max (2, 3) = 16 9 = 25
     } else {
         return $sumOfSquares($b, max([$a, $c])); // 1 2 3   2 max(1, 3) 4 9 = 13
@@ -203,34 +205,46 @@ $test(0, $p());*/ // произойдет ошибка разберем подр
 
 (sqrt 16)*/
 
-// среднее между числами
-$average = function ($x,$y){
-    return ($x + $y) / 2; //1.065
-};
 
-// рабочая функция
-$sqrt = function ($x) use ($square, $average){
+$sqrt = function ($x) {
 
-    $goodEnough = function ($guess) use ($square,$x){
+    // квадрат числа
+    $square = function ($x) {
+        return $x * $x;
+    };
+
+    // среднее значение числа
+    $average = function ($x, $y) {
+        return ($x + $y) / 2;
+    };
+
+    // достаточное приближение?
+    $goodEnough = function ($guess) use ($square, $x) {
+        // abs($square(1.0) - 16)) = 15 < 0.001 // false;
+
         return abs($square($guess) - $x) < 0.001;
     };
 
-    $improve = function ($guess) use ($average, $x){
-        return $average($guess, $x / $guess); // 1, 1/16
+    // улучшение
+    $improve = function ($guess) use ($average, $x) {
+        //$average(1, 16 / 1) = 17 / 2 = 8.5
+        return $average($guess, $x / $guess);
     };
 
+    // рекурсивная функция
     $sqrtIter = function ($guess) use ($goodEnough, $improve, &$sqrtIter) {
-        if($goodEnough($guess)){
+        if ($goodEnough($guess)) {
             return $guess;
         }
         return $sqrtIter($improve($guess));
     };
 
+    // начнем
     return $sqrtIter(1.0);
 };
 
 
-var_dump($sqrt(225));
+//var_dump($sqrt(16));
 // Для наглядности можно составлять процедурную декомпозицию
 // Вопросы: как понять что процесс завершен
 // Определение процедуры должно быть способным скрывать детали
@@ -240,3 +254,5 @@ var_dump($sqrt(225));
 
 // формальные параметры процедуры называют связанными
 // определенение множества процедур не есть хорошо
+
+// блочная структура нужна для разбития большой программы на мелкие куски
