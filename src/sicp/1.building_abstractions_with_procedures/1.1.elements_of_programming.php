@@ -205,7 +205,7 @@ $test(0, $p());*/ // произойдет ошибка разберем подр
 
 (sqrt 16)*/
 
-
+// автономная работа всех частей программы
 $sqrt = function ($x) {
 
     // квадрат числа
@@ -218,11 +218,24 @@ $sqrt = function ($x) {
         return ($x + $y) / 2;
     };
 
+    // модуль числа
+    $abs = function ($x)
+    {
+        if ($x < 0) {
+            return -$x;
+        } elseif ($x === 0) {
+            return 0;
+        } else{
+            return $x;
+        }
+
+    };
+
     // достаточное приближение?
-    $goodEnough = function ($guess) use ($square, $x) {
+    $goodEnough = function ($guess) use ($square, $x, $abs) {
         // abs($square(1.0) - 16)) = 15 < 0.001 // false;
 
-        return abs($square($guess) - $x) < 0.001;
+        return $abs($square($guess) - $x) < 0.001;
     };
 
     // улучшение

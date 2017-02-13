@@ -6,14 +6,15 @@
 // шагов столько какова размереность n
 
 $factorial1 = function ($n) use (&$factorial1) {
-    if ($n === 1) {
+    if ($n === 1) { // проверка когда нужно остановится
         return 1;
     }
 
-    return $n * $factorial1($n - 1);
+    return $n * $factorial1($n - 1); // рекурентная формула
 };
 
 // цепочка отложенных операций
+// интерпретатор все помнит, размеррастет вместе с n
 /*
  * $factorial(6)
  * 6 * $factorial1(5)
@@ -31,7 +32,7 @@ $factorial1 = function ($n) use (&$factorial1) {
  **/
 
 // линейно итеративный процесс
-
+// хранение состояния на каждом шаге
 // произведение = счетчик * произведение
 // счетчик = счетчик + 1
 
@@ -78,11 +79,14 @@ $factorial3 = function ($n) {
  * $factIter(120, 6, 6) $conter > $max
  * $factIter(720, 7, 6) // 720
  *
+ * В итоге мы продумываем правила как переменные состояния работают между собой, число шагов зависит от n
   */
 
 //var_dump($factorial1(6));
 //var_dump($factorial2(6));
 //var_dump($factorial3(6));
+
+// Но при большом числе не хватит памяти, в итеративном процессе мы знаем состояние на каждом шаге и можем его прервать
 
 // Упражения
 
@@ -181,8 +185,21 @@ $fib = function ($n) use (&$fib) {
     }
 };
 
-$fib2 = function ($n) use (&$fib2) {
+//var_dump($fib(5));
 
+/*
+                      fib(5)
+               fib(4)                   fib(3)
+        fib(3)          fib(2)      fib(2)  fib(1)
+   fib(2)   fib(1) fib(1) fib(0)  fib(1) fib(0) 1
+fib(1) fib(0)  1     1      0       1       0
+   1    0
+
+
+В этом решение много лишних операций неэффективный и медленный
+ * */
+$fib2 = function ($n) use (&$fib2) {
+    // a b два последних числа
     $iter = function ($a, $b, $count) use (&$iter) {
         if ($count == 0) {
             return $b;
@@ -191,6 +208,9 @@ $fib2 = function ($n) use (&$fib2) {
     };
     return $iter(1, 0, $n);
 };
+// это решение более эффективно
+//var_dump($fib2(5));
+
 
 //рекурсивный процесс
 
@@ -278,6 +298,14 @@ $sine = function ($angle) use ($p, &$sine) {
     }
 };
 
+/*
+ * b^n
+ * b^n = b * b^-1
+ * b^0 = 0
+ *
+ * Тетта(n) шагов
+ * Тетта(n) памяти
+ * */
 // возведение числа в степень n - число e - степень
 
 $exp = function ($n, $e) use (&$exp) {
@@ -301,11 +329,19 @@ $exp = function ($n, $e) use (&$exp) {
  * */
 
 $exp2 = function ($b, $n) {
-
+    /*
+     * b - число
+     * counter - счетчик
+     * product - решение
+     *
+     * Тетта(n) шагов
+     * Тетта(1) памяти независит от n
+     * */
     $expIter = function ($b, $counter, $product) use (&$expIter) {
-        if ($counter == 0) {
+        if ($counter == 0) { // прекращаем процесс когда
             return $product;
         }
+        // b - не меняется counter это степень числа, за шаг вычитаем 1, результат * число
         return $expIter($b, $counter - 1, $product * $b);
     };
 
@@ -313,12 +349,102 @@ $exp2 = function ($b, $n) {
 };
 
 
-/*
- * expIter(2, 2, 1) (число, счетчик-степень, результат умножения)
- * expIter(2, 1, 2)
- * expIter(2, 0, 4)
- * 4
- *
- * */
 //var_dump($exp(2, 2));
 //var_dump($exp2(2, 2));
+
+// Но есть более эффективное решение
+// Здесь мы не умножаем каждый раз
+/**/
+//var_dump($exp2(2, 8));
+$e = 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2;
+$e2 = 2 * 2;
+$e4 = (2 * 2) * (2 * 2);
+$e8 = ((2 * 2) * (2 * 2)) * ((2 * 2) * (2 * 2));
+
+
+//var_dump($e8);
+/**
+ * Колличество шагов здесь Тетта(log(n)) - медленный рост колличества шагов
+ * На самом деле это очень эффективный алгоритм
+ * @param $b
+ * @param $n
+ * @return int
+ */
+// рекурсивный процесс
+$fastExp = function ($b, $n) use (&$fastExp) {
+    // проверка числа на четность
+    $even = function ($n) {
+        if ($n % 2 == 0) {
+            return true;
+        }
+        return false;
+    };
+
+    $square = function ($n) {
+        return $n * $n;
+    };
+    // b число n степень
+    /*
+
+    (b, n)
+    n всегда будет уменьшаться
+    когда n == 0         то  1
+    когда n делится на 2 то (b, n / 2) * (b, n / 2)
+    когда n !== 0        то b * (b, n - 1) // это обычное действие которое производилось выше
+
+    */
+    if ($n == 0) {
+        return 1;
+    } elseif ($even($n)) {
+        return $square($fastExp($b, $n / 2));
+    } else {
+        return $b * $fastExp($b, $n - 1);
+    }
+};
+
+// итеративный процесс за логарифмические число шагов
+$fastExpIter = function ($b, $n) {
+    $even = function ($n) {
+        if ($n % 2 == 0) {
+            return true;
+        }
+        return false;
+    };
+
+    $square = function ($n) {
+        return $n * $n;
+    };
+    // b число n степень
+    // b число $counter - счетчик итераций то есть сама степень куда возводить a - результат
+    // когда n == 0 то вернем результат a который будет накоплен там
+    // когда n делится на 2 то вызовем (число * число, степень / 2, 1)
+    // когда n не делиться на 2 то (число, степень - 1, 1 * число)
+    $iter = function ($b, $counter, $a) use (&$iter, $even, $square) {
+        if ($counter == 0) {
+            return $a;
+        } elseif ($even($counter)) {
+            return $iter($b * $b, $counter / 2, $a);
+        } else {
+            return $iter($b, $counter - 1, $a * $b);
+        }
+    };
+    return $iter($b, $n, 1);
+};
+
+//var_dump($fastExp(2, 8));
+//var_dump($fastExpIter(2, 8));
+
+// Наибольший общий делитель
+/* НОД
+    (16, 28) = 4
+*/
+
+$gcd = function ($a, $b) use(&$gcd){
+    if($b == 0){
+        return $a;
+    } else{
+        return $gcd($b, $a % $b);
+    }
+};
+
+//var_dump($gcd(16, 28));
