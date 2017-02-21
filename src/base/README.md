@@ -16,3 +16,6 @@ Base
 + list
 + map
 + hierarchyStructures
++ accumulate
++ filter
++ conventionalInterfaces
